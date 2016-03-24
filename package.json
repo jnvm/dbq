@@ -1,0 +1,14 @@
+{
+  "name": "dbq",
+  "version": "0.1.3",
+  "description": "terse node-mysql query wrapper that supports parallel + series execution",
+  "main": "dbq.js",
+  "dependencies": {
+    "async": "^1.5.2",
+    "tisnthings": "^1.6.18"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "author": "Joη <j@nvm.io> (http://nvm.io)",
+  "license": "MIT"
+}
