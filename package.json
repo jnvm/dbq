@@ -1,6 +1,6 @@
 {
   "name": "dbq",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "terse node-mysql query wrapper that supports parallel + series execution",
   "main": "dbq.js",
   "repository": {

@@ -64,7 +64,7 @@ module.exports=function init(MYSQL,opts){
 								
 								//further, if you're a single-key, return value.
 								if(wantOnlyOne){
-									var k=Object.keys(results[i])
+									var k=Object.keys(results[i]||{})
 									if(k.length==1)
 										results[i]=results[i][k[0]]
 								}
