@@ -69,8 +69,7 @@ module.exports=function init(MYSQL,opts){
 										results[i]=results[i][k[0]]
 								}
 							}
-							//recall promises will only return 1 value
-							next(err,err?[]: results.length==1 ? results[0] : results)
+							next(err,err?[]:results)
 						})
 					})
 				}
@@ -92,7 +91,8 @@ module.exports=function init(MYSQL,opts){
 								console.log(err)
 								reject(err)
 							}
-							resolve(results)
+							//recall promises will only return 1 value
+							resolve(results.length==1? results[0] : results)
 						}
 					])
 				})
