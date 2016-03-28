@@ -112,7 +112,7 @@ module.exports=function init(MYSQL,opts){
 					if (!(tbl.column_name in db.table[tbl.table_name])) db.table[tbl.table_name][tbl.column_name]={}
 					db.table[tbl.table_name][tbl.column_name]=tbl
 				})
-				db.q("set global group_concat_max_len=65536",done)
+				db.q("set global group_concat_max_len=65536",()=>done())
 			})
 		}
 	}
