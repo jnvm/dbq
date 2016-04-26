@@ -23,7 +23,7 @@ If the last input isn't a function, a promise is returned, so is `then`able:
 db("select * from jerrys where dim=?",["c-137"]
 ,"select * from ricks where dim=?",["J19ζ7"]
 ).then(([jerry,doofusRick])=>{//a promise resolves to 1 value, but es6 destructuring can separate them
-   	//fiddle
+       //fiddle
 })
 //if it's thenable, you can catch, too
 .catch(errorHandler)
@@ -33,25 +33,25 @@ db("select * from jerrys where dim=?",["c-137"]
 It can execute queries in series or parallel (assuming you have connection pooling on).
 ```javascript
 //Parallel looks like this:
-db(	//could also have been db.parallel or db.qp or db.q
-	 "select * from user"
-	,"select * from book"
-	,"select * from dinosaur"
+db(    //could also have been db.parallel or db.qp or db.q
+     "select * from user"
+    ,"select * from book"
+    ,"select * from dinosaur"
 ).then(([users,books,dinosaurs])=>{/*fiddle*/})
 
 //series would be:
 db.qs( //or db.series
-	 "update cat set living=false"
-	,"update treaty set active=true where title='Spider Peace'"
-	,"insert into cat2 select * from cat where living=false"
+     "update cat set living=false"
+    ,"update treaty set active=true where title='Spider Peace'"
+    ,"insert into cat2 select * from cat where living=false"
 )
 ```
 [node-mysql's ?-substitution syntax](https://github.com/felixge/node-mysql#escaping-query-values) is also allowed adjacently, as needed:
 ```javascript
-db(	 "select * from grandpa where name=?",["rick"]
-	,"select * from council"//note no substitution needed here, so no [] is supplied
-	,"select * from morty where ?",[{alignment:"evil"}]
-	,"select * from dinosaur"
+db(     "select * from grandpa where name=?",["rick"]
+    ,"select * from council"//note no substitution needed here, so no [] is supplied
+    ,"select * from morty where ?",[{alignment:"evil"}]
+    ,"select * from dinosaur"
 ).then(fiddle)
 ```
 
@@ -70,15 +70,37 @@ Any key:value passed to the `db` options object is `Object.assign`ed to `db`, so
 ```javascript
 var mysql=require("mysql").createPool({
                host:'x',user:'x',password:'x',database:'x'
-              ,useConnectionPooling:true//allow parallel querying!               
+              ,useConnectionPooling:true//allow parallel querying!
               ,connectionLimit:16
               ,connectTimeout:15*60*1000
           })
-	,db=require("dbq")(mysql,{//pass in node-mysql initialized above, then an options {}
-    	//option:[default]
+    ,db=require("dbq")(mysql,{//pass in node-mysql initialized above, then an options {}
+        //option:[default]
         ,verbose:true// console.log queries as they happen?
-    	,log:(query,rows,queryLine,took,db)=>{//maybe you want to customize how queries are logged
-        	console.log(`query in ${took}s:`,query.sql)
+        ,log:(query,rows,queryLine,took,db)=>{//maybe you want to customize how queries are logged
+            console.log(`query in ${took}s:`,query.sql)
         }
     })
 ```
+
+### [Common Methods](#common-methods)
+If you want, you can pass an object and its table name into ```db.attachCommonMethods(model,name,done)``` to attach an opinionated:
+```javascript
+insert(rows[,done])
+update(rows[,done])
+delete(rows[,done])
+get(key[,done]) /*key: If a #, the 1-col primary key; user.get(1)
+    Else,key can be:{
+            col1:val
+            [,col2:val]...etc
+            [,in:true if WHERE should be phrased col IN (vals) for all given cols]
+            [,limit:# if supplied]
+        }
+*/
+get1(key[,done])//adds {limit:1} to key
+//and a
+getBy${FieldName}(key[,done])// per column in the table, assuming schemize() has run to know this.
+```
+All of which use proper ?-substitution, support promise/callback responses, and ```{single}```/```[many]``` things supplied at once.
+
+Anything more complex, consider writing clear SQL.
