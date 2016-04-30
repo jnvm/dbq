@@ -133,7 +133,7 @@ module.exports=function init(MYSQL,opts){
             _.defaults(model,{
                 //common db verbs
                 insert(rows,done){
-                    rows=insistArray(rows)
+                    rows=_.castArray(rows)
                     //this way preserves col order
                     var  insertCols=fields.reduce((set,part)=>set.concat( rows[0][part] ? part : []),[])
                         ,colL=insertCols.length
@@ -144,14 +144,14 @@ module.exports=function init(MYSQL,opts){
                              ,done)
                 }
                 ,update(rows,done){
-                    return db(...insistArray(rows).reduce((queries,row)=>{
+                    return db(..._.castArray(rows).reduce((queries,row)=>{
                         var [pk,whereSubs]=where(row)
                             ,tmp=_.unset(_.extend({},row),priKey)
                         return queries.concat([`update ?? set ? where ${pk} limit 1`,[name,tmp,...whereSubs]])
                     },[]),done)
                 }
                 ,delete(rows,done){
-                    return db(...insistArray(rows).reduce((queries,row)=>{
+                    return db(..._.castArray(rows).reduce((queries,row)=>{
                         var [pk,whereSubs]=where(row)
                         return queries.concat([`delete from ?? where ${pk} limit 1`,[name,...whereSubs]])
                     },[]),done)
