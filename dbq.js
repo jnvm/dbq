@@ -125,7 +125,7 @@ module.exports=function init(MYSQL,opts){
                     var whereSubs=[]
                         ,whereClause=_.map(_.pick(row,_.keys(db.table[name]) ) ,(v,k)=>{
                             whereSubs.push(k,v)
-                            return o.in? " ?? in (?) " : "??=?"
+                            return _.isArray(v)? " ?? in (?) " : "??=?"
                         }).join(" and ")
                     return [whereClause,whereSubs]
                 }
@@ -157,7 +157,7 @@ module.exports=function init(MYSQL,opts){
                     },[]),done)
                 }
                 ,get(key,done){
-                    var [wheres,subs]=where(_.isNumber(key) ? {[priKey[0]]:key} : key,{in:key.in})
+                    var [wheres,subs]=where(_.isNumber(key) ? {[priKey[0]]:key} : key)
                     return db(`select * from ?? where ${wheres} ${key.limit?`limit ${key.limit}`:''}`,[name,...subs],done)
                 }
                 ,get1(key,done){
@@ -169,7 +169,6 @@ module.exports=function init(MYSQL,opts){
                    set[("get by " + field).toMethodName()] = (val, done) => {
                        return model.get({
                            [field]: val
-                           , in : _.isArray(val)
                        }, done)
                    }
                    return set
