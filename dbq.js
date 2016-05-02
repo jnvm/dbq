@@ -161,6 +161,7 @@ module.exports=function init(MYSQL,opts){
                     return db(`select * from ?? where ${wheres} ${key.limit?`limit ${key.limit}`:''}`,[name,...subs],done)
                 }
                 ,get1(key,done){
+                    if(!_.isObject(key)) key={[priKey[0]]:key}
                     key.limit=1
                     return model.get(key,done)
                 }
