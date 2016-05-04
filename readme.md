@@ -18,7 +18,7 @@ db("select * from user where name=?",['morty']
 ,(morty,dim)=>{/*fiddle*/})
 ```
 
-If the last input isn't a function, a promise is returned, so is `then`able:
+If the last input isn't a function, a [bluebird promise](https://github.com/petkaantonov/bluebird#introduction) is returned, so is `then`able:
 ```javascript
 db("select * from jerrys where dim=?",["c-137"]
 ,"select * from ricks where dim=?",["J19ζ7"]

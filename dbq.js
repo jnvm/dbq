@@ -1,5 +1,6 @@
 module.exports=function init(MYSQL,opts){
-    var async=require("async")
+    var Promise = require("bluebird")
+        ,async=require("async")
         ,_=require("lodash")
         ,db
     db={
@@ -158,7 +159,7 @@ module.exports=function init(MYSQL,opts){
                 }
                 ,get(key,done){
                     var [wheres,subs]=where(_.isNumber(key) ? {[priKey[0]]:key} : key)
-                    return db(`select * from ?? where ${wheres} ${key.limit?`limit ${key.limit}`:''}`,[name,...subs],done)
+                    return db(`select * from ?? where ${wheres} ${key.limit && _.isInteger(key.limit)?`limit ${key.limit}`:''}`,[name,...subs],done)
                 }
                 ,get1(key,done){
                     if(!_.isObject(key)) key={[priKey[0]]:key}
