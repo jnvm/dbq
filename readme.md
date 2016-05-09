@@ -22,7 +22,8 @@ If the last input isn't a function, a [bluebird promise](https://github.com/petk
 ```javascript
 db("select * from jerrys where dim=?",["c-137"]
 ,"select * from ricks where dim=?",["J19ζ7"]
-).then(([jerry,doofusRick])=>{//a promise resolves to 1 value, but es6 destructuring can separate them
+).then(([jerry,doofusRick])=>{/* a promise resolves to 1 value
+                                 but es6 destructuring can separate them */
        //fiddle
 })
 //if it's thenable, you can catch, too
@@ -103,3 +104,9 @@ getBy${FieldName}(key[,done])// per column in the table, assuming schemize() has
 All of which use proper ?-substitution, support promise/callback responses, and ```{single}```/```[many]``` things supplied at once.
 
 Anything more complex, consider writing clear SQL.
+
+### [Caveats](#Caveats)
+
+Since parallel execution requires a connection pool, this means queries will occur across different connections,
+_which_ means locally defined variables and temporary tables have no guarantee of existing between queries, since they're connection-local.
+So...define your variables in code, not queries, and consider refactoring before reaching for temp tables.
