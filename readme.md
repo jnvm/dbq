@@ -23,8 +23,8 @@ If the last input isn't a function, a [bluebird promise](https://github.com/petk
 db("select * from jerrys where dim=?",["c-137"]
 ,"select * from ricks where dim=?",["J19ζ7"]
 ).then(([jerry,doofusRick])=>{/* a promise resolves to 1 value
-                                 but es6 destructuring can separate them */
-       //fiddle
+								 but es6 destructuring can separate them */
+	   //fiddle
 })
 //if it's thenable, you can catch, too
 .catch(errorHandler)
@@ -35,24 +35,24 @@ It can execute queries in series or parallel (assuming you have connection pooli
 ```javascript
 //Parallel looks like this:
 db(    //could also have been db.parallel or db.qp or db.q
-     "select * from user"
-    ,"select * from book"
-    ,"select * from dinosaur"
+	 "select * from user"
+	,"select * from book"
+	,"select * from dinosaur"
 ).then(([users,books,dinosaurs])=>{/*fiddle*/})
 
 //series would be:
-db.qs( //or db.series
-     "update cat set living=false"
-    ,"update treaty set active=true where title='Spider Peace'"
-    ,"insert into cat2 select * from cat where living=false"
+db.series( //or db.qs
+	 "update cat set living=false"
+	,"update treaty set active=true where title='Spider Peace'"
+	,"insert into cat2 select * from cat where living=false"
 )
 ```
 [node-mysql's ?-substitution syntax](https://github.com/felixge/node-mysql#escaping-query-values) is also allowed adjacently, as needed:
 ```javascript
-db(     "select * from grandpa where name=?",["rick"]
-    ,"select * from council"//note no substitution needed here, so no [] is supplied
-    ,"select * from morty where ?",[{alignment:"evil"}]
-    ,"select * from dinosaur"
+db(  "select * from grandpa where name=?",["rick"]
+	,"select * from council"//note no substitution needed here, so no [] is supplied
+	,"select * from morty where ?",[{alignment:"evil"}]
+	,"select * from dinosaur"
 ).then(fiddle)
 ```
 
@@ -70,18 +70,18 @@ If your credentials have `information_schema` access, `db.schemize()` will query
 Any key:value passed to the `db` options object is `Object.assign`ed to `db`, so will overwrite defaults. Useful to create your own logging.  For example, I like to add an `ellipsize` option to it & the logger so I can see partial or full queries if debugging.
 ```javascript
 var mysql=require("mysql").createPool({
-               host:'x',user:'x',password:'x',database:'x'
-              ,useConnectionPooling:true//allow parallel querying!
-              ,connectionLimit:16
-              ,connectTimeout:15*60*1000
-          })
-    ,db=require("dbq")(mysql,{//pass in node-mysql initialized above, then an options {}
-        //option:[default]
-        ,verbose:true// console.log queries as they happen?
-        ,log:(query,rows,queryLine,took,db)=>{//maybe you want to customize how queries are logged
-            console.log(`query in ${took}s:`,query.sql)
-        }
-    })
+			   host:'x',user:'x',password:'x',database:'x'
+			  ,useConnectionPooling:true//allow parallel querying!
+			  ,connectionLimit:16
+			  ,connectTimeout:15*60*1000
+		  })
+	,db=require("dbq")(mysql,{//pass in node-mysql initialized above, then an options {}
+		//option:[default]
+		,verbose:true// console.log queries as they happen?
+		,log:(query,rows,queryLine,took,db)=>{//maybe you want to customize how queries are logged
+			console.log(`query in ${took}s:`,query.sql)
+		}
+	})
 ```
 
 ### [Common Methods](#common-methods)
@@ -91,11 +91,11 @@ insert(rows[,done])
 update(rows[,done])//find record by passing in primary key, then updating all non-primary, defined columns
 delete(rows[,done])
 get(key[,done]) /*key: If a #, the 1-col primary key; user.get(1)
-    Else,key creates the WHERE clause: {
-            col1:val
-            [,col2:val]...etc. Note if val is ever [an,array,...] the IN syntax will be used
-            [,limit:# if supplied] so...don't be weird and name your column a MySQL keyword
-        }
+	Else, key creates the WHERE clause: {
+			col1:val
+			[,col2:val]...etc. Note if val is ever [an,array,...] the IN syntax will be used
+			[,limit:# if supplied] so...don't be weird and name your column a MySQL keyword
+		}
 */
 get1(key[,done])//adds {limit:1} to key
 //and a
@@ -107,6 +107,7 @@ Anything more complex, consider writing clear SQL.
 
 ### [Caveats](#Caveats)
 
-Since parallel execution requires a connection pool, this means queries will occur across different connections,
+* **variables and temp tables across multiple connections** - since parallel execution requires a connection pool, this means queries will occur across different connections,
 _which_ means locally defined variables and temporary tables have no guarantee of existing between queries, since they're connection-local.
 So...define your variables in code, not queries, and consider refactoring before reaching for temp tables.
+* **multiple cores** - if you're operating with only one core, you won't benefit meaningfully from running queries in parallel with a connection pool.  2+ cores and you will.  It'd also be appropriate to only have as many connections as cores.  See the `test.js` for benchmark numbers.
