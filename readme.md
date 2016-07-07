@@ -22,9 +22,10 @@ If the last input isn't a function, a [bluebird promise](https://github.com/petk
 ```javascript
 db("select * from jerrys where dim=?",["c-137"]
 ,"select * from ricks where dim=?",["J19ζ7"]
-).then(([jerry,doofusRick])=>{/* a promise resolves to 1 value
-								 but es6 destructuring can separate them */
-	   //fiddle
+).then(([jerry,doofusRick])=>{
+/* a promise resolves to 1 value
+ but es6 destructuring can separate them */
+
 })
 //if it's thenable, you can catch, too
 .catch(errorHandler)
