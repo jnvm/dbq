@@ -1,13 +1,13 @@
 {
   "name": "dbq",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "terse node-mysql query wrapper that supports parallel + series execution",
   "main": "dbq.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/jnvm/dbq.git"
   },
-  "keywords": ["db", "database","async","parallel","series","query","wrapper","terse","brief","mysql","schema","CRUD","node-mysql","connection pool"],
+  "keywords": ["db", "database","async","parallel","series","query","wrapper","terse","brief","mysql","mariadb","schema","CRUD","node-mysql","connection pool"],
   "dependencies": {
     "async": "^1.5.2",
     "bluebird": "^3.3.5",
