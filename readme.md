@@ -1,8 +1,8 @@
 # dbq
 
-`dbq` = (`node-mysql` + `async` for batch execution & flow control) / (a preference for brevity &times; medium naiveté).
+`dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + [`async`](https://github.com/caolan/async) for batch execution & flow control) / (a preference for brevity &times; medium naiveté).
 
-Example: two queries, executed in parallel, two results:
+Example: two queries, [executed in parallel](https://github.com/mysqljs/mysql#executing-queries-in-parallel), two results:
 ```javascript
 db("select * from ricks order by rickness desc limit 1"
 ,"select * from mortys where dim=? order by mortyness desc limit 1",["c-137"]
@@ -13,8 +13,9 @@ db("select * from ricks order by rickness desc limit 1"
 
 Pass a function as the last input, and that will receive query results as inputs in the order supplied:
 ```javascript
-db("select * from user where name=?",['morty']
-,"select name,volume from dims where dim=?",['c-137']
+db("select * from user where name=?",['morty'] //morty query (1)
+,"select name,volume from dims where dim=?",['c-137'] //dimension query (2)
+// ↓(1)  ↓(2)
 ,(morty,dim)=>{/*fiddle*/})
 ```
 
@@ -23,16 +24,14 @@ If the last input isn't a function, a [bluebird promise](https://github.com/petk
 db("select * from jerrys where dim=?",["c-137"]
 ,"select * from ricks where dim=?",["J19ζ7"]
 ).then(([jerry,doofusRick])=>{
-/* a promise resolves to 1 value
- but es6 destructuring can separate them */
-
+/* a promise resolves to 1 value but es6 destructuring separates them */
 })
 //if it's thenable, you can catch, too
 .catch(errorHandler)
-//but it's already going to log out when errors happen anyway
+//but it's already going to message when errors happen anyway
 ```
 ### [Series or Parallel](#series-or-parallel)
-It can execute queries in series or parallel (assuming you have connection pooling on).
+It can execute queries in series or parallel (assuming you have [connection pooling](https://github.com/mysqljs/mysql#pooling-connections) on).
 ```javascript
 //Parallel looks like this:
 db(    //could also have been db.parallel or db.qp or db.q
@@ -48,7 +47,7 @@ db.series( //or db.qs
 	,"insert into cat2 select * from cat where living=false"
 )
 ```
-[node-mysql's ?-substitution syntax](https://github.com/felixge/node-mysql#escaping-query-values) is also allowed adjacently, as needed:
+[mysql's ?-substitution syntax](https://github.com/felixge/node-mysql#escaping-query-values) is also allowed adjacently, as needed:
 ```javascript
 db(  "select * from grandpa where name=?",["rick"]
 	,"select * from council"//note no substitution needed here, so no [] is supplied
@@ -88,14 +87,14 @@ var mysql=require("mysql").createPool({
 ### [Common Methods](#common-methods)
 If you want, you can pass an object and its table name into ```db.attachCommonMethods(model,name,done)``` to attach an opinionated:
 ```javascript
-insert(rows[,done])
-update(rows[,done])//find record by passing in primary key, then updating all non-primary, defined columns
-delete(rows[,done])
+insert(rows[,done])//rows=[{},{},...] / {col1name:val,col2name...}
+update(rows[,done])//find by primary key in rows, update all other cols
+delete(rows[,done])//find by primary key in rows, delete
 get(key[,done]) /*key: If a #, the 1-col primary key; user.get(1)
 	Else, key creates the WHERE clause: {
 			col1:val
-			[,col2:val]...etc. Note if val is ever [an,array,...] the IN syntax will be used
-			[,limit:# if supplied] so...don't be weird and name your column a MySQL keyword
+			[,col2:val]...etc. If val is ever [an,array], uses IN syntax
+			[,limit:# if supplied] so...don't be weird & name your column a MySQL keyword
 		}
 */
 get1(key[,done])//adds {limit:1} to key
@@ -111,5 +110,5 @@ Anything more complex, consider writing clear SQL.
 * **variables and temp tables across multiple connections** - since parallel execution requires a connection pool, this means queries will occur across different connections,
 _which_ means locally defined variables and temporary tables have no guarantee of existing between queries, since they're connection-local.
 So...define your variables in code, not queries, and consider refactoring before reaching for temp tables.
-* **multiple cores** - if your db is only operating with only one core, you won't benefit meaningfully from running queries in parallel with a connection pool.  2+ cores and you will.  It'd also be appropriate to only have as many connections as cores.  See the `test.js` for [benchmark numbers (≈25% faster)](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/edit?usp=sharing), where the db was on the same server as the app, so the local core count was relevant.
+* **multiple cores** - if your db is only operating with only one core, you won't benefit meaningfully from running queries in parallel with a connection pool.  2+ cores and you will.  It'd also be appropriate to only have as many connections as cores.  See the `test.js` for [benchmark numbers (≈25% faster, at least)](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/edit?usp=sharing), where the db was on the same server as the app, so the local core count was relevant.
 * **but isn't node single-threaded?** Yes! But db requests go out to a separate system, node makes the request and receives the data.  And mysql / mariadb can handle multiple queries at once, so why not supply them when you can?
