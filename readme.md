@@ -33,6 +33,16 @@ db(  "select * from ricks order by rickness desc limit 1"
 	,"select * from donors where recipient=? and organ=?",["Shrimply Pibbles","heart"]
 ,(rickest,mortyest,mortyJr,heartDonors)=>/*fiddle*/)
 ```
+[mysql's ?-substitution syntax](https://github.com/felixge/node-mysql#escaping-query-values) to prevent SQL injection is allowed as needed in adjacent arrays (illustrated here):
+```javascript
+                                  /*   ┌──⩤───┐                      */
+db(  "select * from grandpa where name=?",["rick"]
+	,"select * from council" /* ┌────⩤─────────────┬──── = ─┐        */
+	,"select * from morty where ? and pets=?",[{alignment:"evil"},0]
+    ,"select * from dinosaur"         /*   └─⩤────────────────────┘  */	
+                           //↑ note no substitution needed here; no [] supplied
+).then(fiddle)
+```
 
 ### Callbacks or Promises
 
@@ -71,14 +81,6 @@ db.series( //or db.qs
 	,"update treaty set active=true where title='Spider Peace'"
 	,"insert into cat2 select * from cat where living=false"
 )
-```
-[mysql's ?-substitution syntax](https://github.com/felixge/node-mysql#escaping-query-values) is also allowed adjacently, as needed:
-```javascript
-db(  "select * from grandpa where name=?",["rick"]
-	,"select * from council"//note no substitution needed here, so no [] is supplied
-	,"select * from morty where ?",[{alignment:"evil"}]
-	,"select * from dinosaur"
-).then(fiddle)
 ```
 
 Below is a run of `test.js` on 1, 4, and 16 core boxes in series and parallel. Depending on hardware and the types of queries you run, query speed can be increased appreciably. Note no meaningful difference for one core.
@@ -132,7 +134,8 @@ getBy${FieldName}(key[,done])// per column in the table, assuming schemize() has
 ```
 All of which use proper ?-substitution, support promise/callback responses, and ```{single}```/```[many]``` things supplied at once.
 
-Anything more complex, consider writing clear SQL.
+##### How do I sort, offset, group by, _____?
+Anything more complex, [consider writing clear SQL](https://www.youtube.com/watch?v=mIoKRyLcIjo&t=4m).
 
 ### Caveats
 
