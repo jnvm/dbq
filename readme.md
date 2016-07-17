@@ -24,7 +24,7 @@
 * [Caveats](#Caveats)
 
 
-### [Example](#Example)
+### Example
 Four queries, [executed in parallel](https://github.com/mysqljs/mysql#executing-queries-in-parallel), four results:
 ```javascript
 db(	 "select * from ricks order by rickness desc limit 1"
@@ -34,7 +34,7 @@ db(	 "select * from ricks order by rickness desc limit 1"
 ,(rickest,mortyest,mortyJr,heartDonors)=>/*fiddle*/)
 ```
 
-### [Callbacks or Promises](#callbacks-or-promises)
+### Callbacks or Promises
 
 Pass a function as the last input, and that will receive query results as inputs in the order supplied:
 ```javascript
@@ -55,7 +55,7 @@ db("select * from jerrys where dim=?",["c-137"]
 .catch(errorHandler)
 //but it's already going to message when errors happen anyway
 ```
-### [Series or Parallel](#series-or-parallel)
+### Series or Parallel
 It can execute queries in series or parallel (assuming you have [connection pooling](https://github.com/mysqljs/mysql#pooling-connections) on).
 ```javascript
 //Parallel looks like this:
@@ -81,17 +81,17 @@ db(  "select * from grandpa where name=?",["rick"]
 ).then(fiddle)
 ```
 
-### [Return Shortcuts](#return-shortcuts)
+### Return Shortcuts
 Queries are often performed to retrieve single value results, not arrays of objects.
 
 If you end a query with `limit 1`, it will take that one result out of its result `[]`, returning just the row `{}`.
 
 If you _also_ supply only one `select` clause column, the result will be just that `value`, not a `{key:value}`.
 
-### [Schemize](#schemize)
+### Schemize
 If your credentials have `information_schema` access, `db.schemize()` will query it and put a representation of the database's tables and their columns at `db.table` for easy referencing elsewhere in code.
 
-### [Setup & Options](#setup-options)
+### Setup & Options
 Any key:value passed to the `db` options object is `Object.assign`ed to `db`, so will overwrite defaults. Useful to create your own logging.  For example, I like to add an `ellipsize` option to it & the logger so I can see partial or full queries if debugging.
 ```javascript
 var mysql=require("mysql").createPool({
@@ -109,7 +109,7 @@ var mysql=require("mysql").createPool({
 	})
 ```
 
-### [Common Methods](#common-methods)
+### Common Methods
 If you want, you can pass an object and its table name into ```db.attachCommonMethods(model,name,done)``` to attach an opinionated:
 ```javascript
 insert(rows[,done])//rows=[{},{},...] / {col1name:val,col2name...}
@@ -130,7 +130,7 @@ All of which use proper ?-substitution, support promise/callback responses, and 
 
 Anything more complex, consider writing clear SQL.
 
-### [Caveats](#Caveats)
+### Caveats
 
 * **variables and temp tables across multiple connections** - since parallel execution requires a connection pool, this means queries will occur across different connections,
 _which_ means locally defined variables and temporary tables have no guarantee of existing between queries, since they're connection-local.
