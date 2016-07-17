@@ -7,9 +7,26 @@
     "type": "git",
     "url": "https://github.com/jnvm/dbq.git"
   },
-  "keywords": ["db", "database","async","parallel","series","query","wrapper","terse","brief","mysql","mariadb","schema","CRUD","node-mysql","connection pool","spartan"],
+  "keywords": [
+    "db",
+    "database",
+    "async",
+    "parallel",
+    "series",
+    "query",
+    "wrapper",
+    "terse",
+    "brief",
+    "mysql",
+    "mariadb",
+    "schema",
+    "CRUD",
+    "node-mysql",
+    "connection pool",
+    "spartan"
+  ],
   "dependencies": {
-    "async": "^1.5.2",
+    "async": "^2.0.0",
     "bluebird": "^3.3.5",
     "lodash": "^4.11.1"
   },

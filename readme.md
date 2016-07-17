@@ -1,12 +1,25 @@
-# dbq
+# dbq 🍢
 
-`dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + [`async`](https://github.com/caolan/async) for batch execution & flow control) / (a preference for brevity &times; medium naiveté).
+[![npm](https://img.shields.io/npm/dm/dbq.svg?maxAge=86400&label=%F0%9F%93%A5)]()
+[![npm](https://img.shields.io/npm/dt/dbq.svg?maxAge=86400&label=%CE%A3%F0%9F%93%A5)]()
+[![GitHub stars](https://img.shields.io/github/stars/jnvm/dbq.svg?label=%E2%98%85&maxAge=86400)]()
+[![GitHub watchers](https://img.shields.io/github/watchers/jnvm/dbq.svg?label=%E0%B2%A0_%E0%B2%B0%E0%B3%83&maxAge=86400)]()
+[![](https://img.shields.io/github/issues-raw/jnvm/dbq.svg?maxAge=86400&label=%E2%9A%A0)]()
+[![](https://img.shields.io/badge/SLOC-%3C200-brightgreen.svg)]()
+[![](https://hitt.herokuapp.com/jnvm/dbq.svg?label=wtf)]()
+[![](https://img.shields.io/badge/js-2015+-00aaff.svg)]()
+[![David](https://img.shields.io/david/jnvm/dbq.svg?maxAge=2592000)]()
 
-Example: two queries, [executed in parallel](https://github.com/mysqljs/mysql#executing-queries-in-parallel), two results:
+
+`dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + [`async`](https://github.com/caolan/async) for batch execution flow control) / (a preference for brevity &times; medium naiveté).
+
+Example: four queries, [executed in parallel](https://github.com/mysqljs/mysql#executing-queries-in-parallel), four results:
 ```javascript
-db("select * from ricks order by rickness desc limit 1"
-,"select * from mortys where dim=? order by mortyness desc limit 1",["c-137"]
-,(rickest,mortyest)=>/*fiddle*/)
+db(	 "select * from ricks order by rickness desc limit 1"
+	,"select * from mortys where dim=? order by mortyness desc limit 1",["c-137"]
+	,"select * from gazorpazorpians where father=?",["Morty"]
+	,"select * from donors where recipient=? and organ=?",["Shrimply Pibbles","heart"]
+,(rickest,mortyest,mortyJr,heartDonors)=>/*fiddle*/)
 ```
 
 ### [Callbacks or Promises](#callbacks-or-promises)
