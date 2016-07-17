@@ -11,7 +11,7 @@
 [![David](https://img.shields.io/david/jnvm/dbq.svg?maxAge=3600)]()
 
 
-`dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + [`async`](https://github.com/caolan/async) for batch execution flow control) / (a preference for brevity &times; medium naiveté).
+`dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + [`async`](https://github.com/caolan/async) + [`promises`](https://github.com/petkaantonov/bluebird) for batch execution flow control) / (brevity &times; medium naiveté).
 
 ##### Table of Contents
 * [Example](#example)
