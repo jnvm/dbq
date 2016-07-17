@@ -82,7 +82,7 @@ db(  "select * from grandpa where name=?",["rick"]
 ```
 
 Below is a run of `test.js` on 1, 4, and 16 core boxes in series and parallel. Depending on hardware and the types of queries you run, query speed can be increased appreciably. Note no meaningful difference for one core.
-![alt text](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/pubchart?oid=1361741281&format=image "benchmark test")
+[![alt text](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/pubchart?oid=1361741281&format=image "benchmark test")](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/pubchart?oid=1361741281&format=image)
 
 
 ### Return Shortcuts
