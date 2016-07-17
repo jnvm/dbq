@@ -14,7 +14,7 @@
 `dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + [`async`](https://github.com/caolan/async) for batch execution flow control) / (a preference for brevity &times; medium naiveté).
 
 ##### Table of Contents
-* [Example](#Example)
+* [Example](#example)
 * [Callbacks or Promises](#callbacks-or-promises)
 * [Series or Parallel](#series-or-parallel)
 * [Return Shortcuts](#return-shortcuts)
@@ -27,7 +27,7 @@
 ### Example
 Four queries, [executed in parallel](https://github.com/mysqljs/mysql#executing-queries-in-parallel), four results:
 ```javascript
-db(	 "select * from ricks order by rickness desc limit 1"
+db(  "select * from ricks order by rickness desc limit 1"
 	,"select * from mortys where dim=? order by mortyness desc limit 1",["c-137"]
 	,"select * from gazorpazorpians where father=?",["Morty"]
 	,"select * from donors where recipient=? and organ=?",["Shrimply Pibbles","heart"]
