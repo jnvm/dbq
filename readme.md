@@ -1,14 +1,14 @@
 # dbq 🍢
 
-[![npm](https://img.shields.io/npm/dm/dbq.svg?maxAge=86400&label=%F0%9F%93%A5)]()
-[![npm](https://img.shields.io/npm/dt/dbq.svg?maxAge=86400&label=%CE%A3%F0%9F%93%A5)]()
-[![GitHub stars](https://img.shields.io/github/stars/jnvm/dbq.svg?label=%E2%98%85&maxAge=86400)]()
-[![GitHub watchers](https://img.shields.io/github/watchers/jnvm/dbq.svg?label=%E0%B2%A0_%E0%B2%B0%E0%B3%83&maxAge=86400)]()
-[![](https://img.shields.io/github/issues-raw/jnvm/dbq.svg?maxAge=86400&label=%E2%9A%A0)]()
-[![](https://img.shields.io/badge/SLOC-%3C200-brightgreen.svg)]()
-[![](https://hitt.herokuapp.com/jnvm/dbq.svg?label=wtf)]()
+[![npm](https://img.shields.io/npm/dm/dbq.svg?maxAge=86400&label=%F0%9F%93%A5)](http://npm-stat.com/charts.html?package=dbq)
+[![npm](https://img.shields.io/npm/dt/dbq.svg?maxAge=86400&label=%CE%A3%F0%9F%93%A5)](http://npm-stat.com/charts.html?package=dbq)
+[![GitHub stars](https://img.shields.io/github/stars/jnvm/dbq.svg?label=%E2%98%85&maxAge=86400)](https://github.com/jnvm/dbq/stargazers)
+[![GitHub watchers](https://img.shields.io/github/watchers/jnvm/dbq.svg?label=%E0%B2%A0_%E0%B2%B0%E0%B3%83&maxAge=86400)](https://github.com/jnvm/dbq/watchers)
+[![](https://img.shields.io/github/issues-raw/jnvm/dbq.svg?maxAge=86400&label=%E2%9A%A0)](https://github.com/jnvm/dbq/issues)
+[![](https://img.shields.io/badge/SLOC-%3C200-brightgreen.svg)](https://github.com/jnvm/dbq/blob/master/dbq.js)
+[![](https://hitt.herokuapp.com/jnvm/dbq.svg)]()
 [![](https://img.shields.io/badge/js-2015+-00aaff.svg)]()
-[![David](https://img.shields.io/david/jnvm/dbq.svg?maxAge=2592000)]()
+[![David](https://img.shields.io/david/jnvm/dbq.svg?maxAge=3600)]()
 
 
 `dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + [`async`](https://github.com/caolan/async) for batch execution flow control) / (a preference for brevity &times; medium naiveté).
