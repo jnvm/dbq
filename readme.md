@@ -19,7 +19,7 @@
 * [Series or Parallel](#series-or-parallel)
 * [Return Shortcuts](#return-shortcuts)
 * [Schemize](#schemize)
-* [Setup & Options](#setup-options)
+* [Setup & Options](#setup--options)
 * [Common Methods](#common-methods)
 * [Caveats](#Caveats)
 
