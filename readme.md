@@ -135,7 +135,7 @@ getBy${FieldName}(key[,done])// per column in the table, assuming schemize() has
 All of which use proper ?-substitution, support promise/callback responses, and ```{single}```/```[many]``` things supplied at once.
 
 ##### How do I sort, offset, group by, _____?
-Anything more complex, [consider writing clear SQL](https://www.youtube.com/watch?v=mIoKRyLcIjo&t=4m).
+Anything more complex, [consider writing clear SQL](https://www.youtube.com/watch?v=mIoKRyLcIjo&t=4m), placing reused queries in descriptively named functions.  There's a reason SQL is its own language.
 
 ### Caveats
 
