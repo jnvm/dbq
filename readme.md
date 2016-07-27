@@ -1,4 +1,3 @@
-[comment]: <> (# dbq 🍢)
 [![npm](https://img.shields.io/npm/dm/dbq.svg?maxAge=86400&label=%F0%9F%93%A5)](http://npm-stat.com/charts.html?package=dbq)
 [![npm](https://img.shields.io/npm/dt/dbq.svg?maxAge=86400&label=%CE%A3%F0%9F%93%A5)](http://npm-stat.com/charts.html?package=dbq)
 [![GitHub stars](https://img.shields.io/github/stars/jnvm/dbq.svg?label=%E2%98%85&maxAge=86400)](https://github.com/jnvm/dbq/stargazers)
