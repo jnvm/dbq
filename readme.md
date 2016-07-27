@@ -1,5 +1,4 @@
-# dbq 🍢
-
+[comment]: <> (# dbq 🍢)
 [![npm](https://img.shields.io/npm/dm/dbq.svg?maxAge=86400&label=%F0%9F%93%A5)](http://npm-stat.com/charts.html?package=dbq)
 [![npm](https://img.shields.io/npm/dt/dbq.svg?maxAge=86400&label=%CE%A3%F0%9F%93%A5)](http://npm-stat.com/charts.html?package=dbq)
 [![GitHub stars](https://img.shields.io/github/stars/jnvm/dbq.svg?label=%E2%98%85&maxAge=86400)](https://github.com/jnvm/dbq/stargazers)
@@ -9,7 +8,7 @@
 [![](https://hitt.herokuapp.com/jnvm/dbq.svg)]()
 [![](https://img.shields.io/badge/js-2015+-00aaff.svg)]()
 [![David](https://img.shields.io/david/jnvm/dbq.svg?maxAge=3600)]()
-
+![dbq logo](https://cldup.com/kKMuXfEQzP.svg)
 
 `dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + [`async`](https://github.com/caolan/async) + [`promises`](https://github.com/petkaantonov/bluebird) for batch execution flow control) / (brevity &times; medium naiveté).
 
