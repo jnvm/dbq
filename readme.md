@@ -9,7 +9,7 @@
 [![David](https://img.shields.io/david/jnvm/dbq.svg?maxAge=3600)]()
 ![dbq logo](https://cldup.com/kKMuXfEQzP.svg)
 
-`dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + [`async`](https://github.com/caolan/async) + [`promises`](https://github.com/petkaantonov/bluebird) for batch execution flow control) / (brevity &times; medium naiveté).
+`dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + (async || [`promises`](https://github.com/petkaantonov/bluebird) for batch execution flow control)) / (brevity &times; medium naiveté).
 
 ##### Table of Contents
 * [Example](#example)
