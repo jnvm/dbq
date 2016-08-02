@@ -1,6 +1,6 @@
 {
   "name": "dbq",
-  "version": "0.2.14",
+  "version": "0.3.0",
   "description": "terse node-mysql query wrapper to ease parallel + series query execution",
   "main": "dbq.js",
   "repository": {
@@ -26,7 +26,6 @@
     "spartan"
   ],
   "dependencies": {
-    "async": "^2.0.0",
     "bluebird": "^3.3.5",
     "lodash": "^4.11.1"
   },

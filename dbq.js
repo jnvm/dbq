@@ -1,6 +1,15 @@
 module.exports=function init(MYSQL,opts){
 	var Promise = require("bluebird")
-		,async=require("async")
+		,inFlow={
+			series:function(calls,done){
+				return Promise.each(calls)
+					.then(done)
+			}
+			,parallel:function(calls,done){
+				return Promise.all(calls)
+					.then(done)
+			}
+		}//require("async")
 		,_=require("lodash")
 		,db
 	db={
@@ -49,7 +58,7 @@ module.exports=function init(MYSQL,opts){
 			//form into async input function set
 			querySets=querySets.map((qset,i)=>{
 				//note connections are lazily retained, so this won't have real overhead once the pool is filled
-				return next=>{
+				return new Promise((good,bad)=>{
 					var t1=Date.now()
 					MYSQL.getConnection((err,dbi)=>{
 						if(err) throw Error(err)
@@ -72,32 +81,29 @@ module.exports=function init(MYSQL,opts){
 										results[i]=results[i][k[0]]
 								}
 							}
-							next(err,err?[]:results)
+							if(err) bad(err)
+							else good(results)
 						})
 					})
-				}
+				})
 			})
 
 			//call in desired flow & synchronicity, then place results as params to callback in original sequence provided.  This lets writer usefully name result vars in callback
-
 			if(callback)
-				return async[flow]( ...[
+				inFlow[flow]( ...[
 					querySets
 					, x => callback(...results)
 				])
 			else
 				return new Promise((resolve,reject)=>{
-					async[flow]( ...[
+					inFlow[flow]( ...[
 						querySets
-						, (err,asyncResults) =>{
-							if(err){
-								console.log(err)
-								reject(err)
-							}
+						, (asyncResults) =>{
 							//recall promises will only return 1 value
 							resolve(results.length==1? results[0] : results)
 						}
 					])
+					.catch(err=>reject(err))
 				})
 		}
 		,qs:(...a)=>db.query(...(['series'  ].concat(a)) )
@@ -110,12 +116,12 @@ module.exports=function init(MYSQL,opts){
 			done=done||function(){}
 			//actually ask the db what it has
 			  db.q("select table_catalog,table_schema,table_name,column_name,ordinal_position,column_default,is_nullable,data_type,character_maximum_length,character_octet_length,numeric_precision,numeric_scale,character_set_name,collation_name,column_type,column_key,extra,privileges,column_comment from information_schema.columns where table_schema=?",[MYSQL.config.connectionConfig.database],tables=>{
-				tables.forEach(tbl=>{
+				tables && tables.forEach(tbl=>{
 					if (!(tbl.table_name in db.table)) db.table[tbl.table_name]={}
 					if (!(tbl.column_name in db.table[tbl.table_name])) db.table[tbl.table_name][tbl.column_name]={}
 					db.table[tbl.table_name][tbl.column_name]=tbl
 				})
-				db.q("set global group_concat_max_len=65536",()=>done())
+				done()
 			})
 		}
 		,attachCommonMethods(model,name,done){
@@ -181,7 +187,6 @@ module.exports=function init(MYSQL,opts){
 	}
 
 	Object.assign(db,opts)
-
 	//allow db("select ...") in addition to db.q("select ...")
 	Object.assign(db.q,db)
 	db=db.q
