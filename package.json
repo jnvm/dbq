@@ -1,7 +1,7 @@
 {
   "name": "dbq",
-  "version": "0.3.1",
-  "description": "terse node-mysql query wrapper to ease parallel + series query execution",
+  "version": "0.3.2",
+  "description": "terse node-mysql query wrapper to ease parallel + series execution",
   "main": "dbq.js",
   "repository": {
     "type": "git",
@@ -9,6 +9,7 @@
   },
   "keywords": [
     "db",
+    "DB",
     "database",
     "async",
     "parallel",
@@ -18,12 +19,20 @@
     "terse",
     "brief",
     "mysql",
+    "MYSQL",
+    "MySQL",
     "mariadb",
     "schema",
     "CRUD",
+    "crud",
     "node-mysql",
     "connection pool",
-    "spartan"
+    "spartan",
+    "simple",
+    "sql",
+    "SQL",
+    "orm",
+    "ORM"
   ],
   "dependencies": {
     "bluebird": "^3.3.5",

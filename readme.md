@@ -19,7 +19,7 @@
 * [Schemize](#schemize)
 * [Setup & Options](#setup--options)
 * [Common Methods](#common-methods)
-* [Caveats](#Caveats)
+* [Caveats](#caveats)
 
 
 ### Example
