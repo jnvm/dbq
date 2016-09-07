@@ -117,7 +117,7 @@ var mysql=require("mysql").createPool({
 If you want, you can pass an object and its table name into ```db.attachCommonMethods(model,name,done)``` to attach an opinionated:
 ```javascript
 insert(rows[,done])//rows=[{},{},...] / {col1name:val,col2name...}
-update(rows[,done])//find by primary key in rows, update all other cols
+update(rows[,done])//find by primary key in rows, update all other cols supplied
 delete(rows[,done])//find by primary key in rows, delete
 get(key[,done]) /*key: If a #, the 1-col primary key; user.get(1)
 	Else, key creates the WHERE clause: {

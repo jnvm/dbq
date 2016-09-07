@@ -19,7 +19,6 @@ module.exports=function init(MYSQL,opts){
 		}
 		,query:(flow,...queryInfo)=>{
 			flow=flow||'series'
-
 			var callback=queryInfo.pop()
 			//did I assume there was a callback when there wasn't?
 			if(!_.isFunction(callback)){
@@ -73,7 +72,6 @@ module.exports=function init(MYSQL,opts){
 								//did you hint you only want one row? If so, don't return a row, just the object
 								var wantOnlyOne=!!qset.sql.match(/limit\s+1\s*$/i)
 								results[i]=wantOnlyOne ? rows[0] : rows
-
 								//further, if you're a single-key, return value.
 								if(wantOnlyOne){
 									var k=Object.keys(results[i]||{})
@@ -87,7 +85,6 @@ module.exports=function init(MYSQL,opts){
 					})
 				})
 			})
-
 			//call in desired flow & synchronicity, then place results as params to callback in original sequence provided.  This lets writer usefully name result vars in callback
 			if(callback)
 				inFlow[flow]( ...[
@@ -136,7 +133,14 @@ module.exports=function init(MYSQL,opts){
 						}).join(" and ")
 					return [whereClause,whereSubs]
 				}
-
+				,toMethodName=function(str){
+					return str
+						.replace(/([a-z])([A-Z])/g,'$1 $2')
+						.replace(/([^_])_([^_])/g,'$1 $2')
+						.replace(/\w\S*/g, function toProperCase(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()})
+						.split(" ").join("").split("")
+						.reduce(function decapitalize(name,ltr,i){return name+(i==0? ltr.toLowerCase() : ltr)},"")
+				}
 			_.defaults(model,{
 				//common db verbs
 				insert(rows,done){
@@ -174,7 +178,7 @@ module.exports=function init(MYSQL,opts){
 				}
 			},  //where clause by field
 			   fields.reduce((set, field) => {
-				   set[("get by " + field).toMethodName()] = (val, done) => {
+				   set[toMethodName("get by " + field)] = (val, done) => {
 					   return model.get({
 						   [field]: val
 					   }, done)
@@ -185,11 +189,9 @@ module.exports=function init(MYSQL,opts){
 			done(model)
 		}
 	}
-
 	Object.assign(db,opts)
 	//allow db("select ...") in addition to db.q("select ...")
 	Object.assign(db.q,db)
 	db=db.q
-
 	return db
 }
