@@ -3,7 +3,7 @@ var mocha=require("mocha")
 	,mysql=require("mysql")
 	,db=false
 	,goodCreds={
-		user: 'x'
+		user: process.env.TRAVIS ? 'root':'x'
 		,password: ''
 		,database: 'test'
 		,useConnectionPooling: true
@@ -30,6 +30,10 @@ describe("dbq",function(){
 	})
 	afterEach(()=>{
 		return db=undefined
+	})
+	
+	after(()=>{
+		return require("./dbq")(mysql.createPool(goodCreds),{verbose:false})("drop table if exists blah")
 	})
 	
 	it("should be able to connect to db & instantiate a pool given a valid connection",ok=>{
