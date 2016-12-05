@@ -35,8 +35,8 @@ db(  "select * from ricks order by rickness desc limit 1"
 ```javascript
                                   /*   ┌──⩤───┐                      */
 db(  "select * from grandpa where name=?",["rick"]
-	,"select * from zones where ?? in (?)",['allowed',['flarping','unflarping']
-	,"select * from council" /* ┌────⩤─────────────┬──── = ─┐        */
+	,"select * from zones where ?? in (?)",['allowed',['flarping','unflarping']]	
+,"select * from council" /* ┌────⩤─────────────┬──── = ─┐        */
 	,"select * from morty where ? and pets=?",[{alignment:"evil"},0]
     ,"select * from cronenberg"       /*   └─⩤────────────────────┘  */	
                              //↑ note no substitution needed here; no [] supplied
