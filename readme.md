@@ -5,7 +5,6 @@
 [![GitHub watchers](https://img.shields.io/github/watchers/jnvm/dbq.svg?label=%E0%B2%A0_%E0%B2%B0%E0%B3%83&maxAge=86400)](https://github.com/jnvm/dbq/watchers)
 [![](https://img.shields.io/github/issues-raw/jnvm/dbq.svg?maxAge=86400&label=%E2%9A%A0)](https://github.com/jnvm/dbq/issues)
 [![](https://img.shields.io/badge/SLOC-%3C250-brightgreen.svg)](https://github.com/jnvm/dbq/blob/master/dbq.js)
-[![](https://hitt.herokuapp.com/jnvm/dbq.svg)]()
 [![David](https://img.shields.io/david/jnvm/dbq.svg?maxAge=3600)]()
 ![dbq logo](https://cldup.com/kKMuXfEQzP.svg)
 
