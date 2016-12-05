@@ -121,7 +121,7 @@ db.verbose=false
 //but you want to check a specific call:
 db.setOnce({verbose:true})("select * from meeseeks").then(lookitMee=>{/* etc */})
 //next call will be back to normal
-db("select * from friends where name=?",['Bird Person']).then(birdPers=>/**/)
+db("select * from friends where name=?",['Bird Person']).then(birdPerson=>/**/)
 ```
 
 ### Common Methods
