@@ -180,7 +180,7 @@ describe("dbq",function(){
 				,`select @a,@b,@c,@d,@e,@f,@g,@h,(@i:=1),@j limit 1`
 				,`select @a,@b,@c,@d,@e,@f,@g,@h,@i,(@j:=1) limit 1`
 			).then(res=>{
-				var sum=res.map(r=>Object.values(r).reduce((set,part)=>set+(part||0),0))
+				var sum=res.map(r=>Object.keys(r).map(x=>r[x]).reduce((set,part)=>set+(part||0),0))
 					.reduce((set,part)=>set+(part||0),0)
 				expect(sum).to.eq(10)
 			})
