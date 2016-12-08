@@ -36,7 +36,7 @@ db(  "select * from ricks order by rickness desc limit 1"
                                   /*   ┌──⩤───┐                      */
 db(  "select * from grandpa where name=?",["rick"]
 	,"select * from zones where ?? in (?)",['allowed',['flarping','unflarping']]	
-,"select * from council" /* ┌────⩤─────────────┬──── = ─┐        */
+	,"select * from council" /* ┌────⩤─────────────┬──── = ─┐        */
 	,"select * from morty where ? and pets=?",[{alignment:"evil"},0]
     ,"select * from cronenberg"       /*   └─⩤────────────────────┘  */	
                              //↑ note no substitution needed here; no [] supplied
@@ -83,7 +83,7 @@ db.series( //or db.qs
 ```
 Note series queries share the same connection, allowing connection-dependent features, like temp tables, variables, and transactions.
 
-Below is a run of `test.js` on 1, 4, and 16 core boxes in series and parallel. Depending on hardware and the types of queries you run, query speed can be increased appreciably. Note no meaningful difference for one core.
+Below is a run of `benchmark.js` on 1, 4, and 16 core boxes in series and parallel. Depending on hardware and the types of queries you run, query speed can be increased appreciably. Note no meaningful difference for one core.
 [![alt text](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/pubchart?oid=1361741281&format=image "benchmark test")](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/pubchart?oid=1361741281&format=image)
 
 
@@ -150,5 +150,5 @@ Anything more complex, [consider just writing clear SQL](https://www.youtube.com
 * **variables and temp tables across multiple connections** - since parallel execution requires a connection pool, this means parallel queries will occur across different connections,
 _which_ means locally defined variables, transactions, and temporary tables have no guarantee of existing between queries, since they're connection-local.
 So...define your variables in code, not queries, and consider refactoring or phrasing in series before reaching for connection-dependent features.
-* **multiple cores** - if your db is operating with only one core, you won't benefit meaningfully from running queries in parallel with a connection pool.  2+ cores and you will.  It'd also be appropriate to only have as many connections as cores.  See the `test.js` for [benchmark numbers](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/edit?usp=sharing), where the db was on the same server as the app, so the local core count was relevant.
+* **multiple cores** - if your db is operating with only one core, you won't benefit meaningfully from running queries in parallel with a connection pool.  2+ cores and you will.  It'd also be appropriate to only have as many connections as cores.  See the `benchmark.js` for [benchmark numbers](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/edit?usp=sharing), where the db was on the same server as the app, so the local core count was relevant.
 * **but isn't node single-threaded?** Yes! But db requests go out to a separate system, node makes the request and receives the data.  And mysql / mariadb can handle multiple queries at once, so why not supply them when you can?
