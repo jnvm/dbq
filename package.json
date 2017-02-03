@@ -1,7 +1,7 @@
 {
   "name": "dbq",
-  "version": "1.0.1",
-  "description": "terse node-mysql query wrapper to ease parallel + series execution",
+  "version": "1.0.2",
+  "description": "terse node-mysql query wrapper to ease parallel + series execution & CRUD ops, leaving to SQL what it does best.",
   "main": "dbq.js",
   "repository": {
     "type": "git",
@@ -32,7 +32,8 @@
     "spartan",
     "simple",
     "sql",
-    "orm"
+    "orm",
+    "anti-orm"
   ],
   "dependencies": {
     "bluebird": "^3.3.5",

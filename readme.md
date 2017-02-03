@@ -7,10 +7,15 @@
 [![](https://img.shields.io/badge/SLOC-%3C250-brightgreen.svg)](https://github.com/jnvm/dbq/blob/master/dbq.js)
 [![Build Status](https://travis-ci.org/jnvm/dbq.svg?branch=master)](https://travis-ci.org/jnvm/dbq)
 [![David](https://img.shields.io/david/jnvm/dbq.svg?maxAge=3600)]()
-![dbq logo](https://cldup.com/kKMuXfEQzP.svg)
+<div style="text-align:center;">
+	<img src="https://cldup.com/kKMuXfEQzP.svg" alt="dbq logo" style="max-width:700px;width:100%">
+</div>
 
-`dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + (async || [`promises`](https://github.com/petkaantonov/bluebird) for batch execution flow control)) / (brevity &times; medium naiveté).
+`dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + (callbacks || [`promises`](https://github.com/petkaantonov/bluebird) for batch execution flow control)) / (brevity &times; medium naiveté)[+ CRUD].
 
+```
+npm i dbq
+```
 ##### Table of Contents
 * [Example](#example)
 * [Callbacks or Promises](#callbacks-or-promises)
@@ -18,7 +23,7 @@
 * [Return Shortcuts](#return-shortcuts)
 * [Schemize](#schemize)
 * [Setup & Options](#setup--options)
-* [Common Methods](#common-methods)
+* [Common Methods / CRUD](#common-methods)
 * [Caveats](#caveats)
 
 
@@ -83,7 +88,7 @@ db.series( //or db.qs
 ```
 Note series queries share the same connection, allowing connection-dependent features, like temp tables, variables, and transactions.
 
-Below is a run of `test.js` on 1, 4, and 16 core boxes in series and parallel. Depending on hardware and the types of queries you run, query speed can be increased appreciably. Note no meaningful difference for one core.
+Below is a run of `benchmark.js` on 1, 4, and 16 core boxes in series and parallel. Depending on hardware and the types of queries you run, query speed can be increased appreciably. Note no meaningful difference for one core.
 [![alt text](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/pubchart?oid=1361741281&format=image "benchmark test")](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/pubchart?oid=1361741281&format=image)
 
 
@@ -124,8 +129,10 @@ db.setOnce({verbose:true})("select * from meeseeks").then(lookitMee=>{/* etc */}
 db("select * from friends where name=?",['Bird Person']).then(birdPerson=>/**/)
 ```
 
-### Common Methods
-If you want, you can pass an object and its table name into ```db.attachCommonMethods(model,name,done)``` to attach an opinionated:
+### Common Methods / CRUD
+(**C**reate, **R**ead, **U**pdate, **D**elete)
+
+If you want, you can pass an object and its single-column primary keyed table name into ```db.attachCommonMethods(model,name,done)``` to attach an opinionated:
 ```javascript
 insert(rows[,done])//rows=[{},{},...] / {col1name:val,col2name...}
 update(rows[,done])//find by primary key in rows, update all other cols supplied
@@ -140,15 +147,21 @@ get(key[,done]) /*
 */
 getBy${FieldName}(key[,done])// per column in the table, assuming schemize() has run to know this.
 ```
-All of which use proper ?-substitution, support promise/callback responses, and ```{single}```/```[many]``` things supplied at once.
+All of which support:
+* proper ?-substitution
+* promise/callback responses
+*  ```{single}```/```[many]``` things supplied at once
+* query compaction wherever possible: many things can be `edit`ed or `insert`ed into a table in one query
+
+Further usage examples can be found in [test.js](https://github.com/jnvm/dbq/blob/master/test.js#L274).
 
 ##### How do I sort, offset, group by, _____?
 Anything more complex, [consider just writing clear SQL](https://www.youtube.com/watch?v=mIoKRyLcIjo&t=4m), placing reused queries in descriptively named functions.  There's a reason SQL is its own language.
 
 ### Caveats
 
-* **variables and temp tables across multiple connections** - since parallel execution requires a connection pool, this means parallel queries will occur across different connections,
+* **variables and temp tables in parallel** - since parallel execution requires a connection pool, this means parallel queries will occur across different connections,
 _which_ means locally defined variables, transactions, and temporary tables have no guarantee of existing between queries, since they're connection-local.
-So...define your variables in code, not queries, and consider refactoring or phrasing in series before reaching for connection-dependent features.
+So...define your variables in code, not queries, and consider refactoring or phrasing in series before reaching for connection-dependent features. *Or* just query them in `db.series`!
 * **multiple cores** - if your db is operating with only one core, you won't benefit meaningfully from running queries in parallel with a connection pool.  2+ cores and you will.  It'd also be appropriate to only have as many connections as cores.  See the `test.js` for [benchmark numbers](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/edit?usp=sharing), where the db was on the same server as the app, so the local core count was relevant.
 * **but isn't node single-threaded?** Yes! But db requests go out to a separate system, node makes the request and receives the data.  And mysql / mariadb can handle multiple queries at once, so why not supply them when you can?
