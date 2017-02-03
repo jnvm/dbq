@@ -23,7 +23,7 @@ npm i dbq
 * [Return Shortcuts](#return-shortcuts)
 * [Schemize](#schemize)
 * [Setup & Options](#setup--options)
-* [Common Methods / CRUD](#common-methods)
+* [Common Methods / CRUD](#common-methods--crud)
 * [Caveats](#caveats)
 
 
