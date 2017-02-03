@@ -41,7 +41,7 @@ db(  "select * from ricks order by rickness desc limit 1"
                                   /*   ┌──⩤───┐                      */
 db(  "select * from grandpa where name=?",["rick"]
 	,"select * from zones where ?? in (?)",['allowed',['flarping','unflarping']]	
-,"select * from council" /* ┌────⩤─────────────┬──── = ─┐        */
+	,"select * from council" /* ┌────⩤─────────────┬──── = ─┐        */
 	,"select * from morty where ? and pets=?",[{alignment:"evil"},0]
     ,"select * from cronenberg"       /*   └─⩤────────────────────┘  */	
                              //↑ note no substitution needed here; no [] supplied
@@ -163,5 +163,5 @@ Anything more complex, [consider just writing clear SQL](https://www.youtube.com
 * **variables and temp tables in parallel** - since parallel execution requires a connection pool, this means parallel queries will occur across different connections,
 _which_ means locally defined variables, transactions, and temporary tables have no guarantee of existing between queries, since they're connection-local.
 So...define your variables in code, not queries, and consider refactoring or phrasing in series before reaching for connection-dependent features. *Or* just query them in `db.series`!
-* **multiple cores** - if your db is operating with only one core, you won't benefit meaningfully from running queries in parallel with a connection pool.  2+ cores and you will.  It'd also be appropriate to only have as many connections as cores.  See the `test.js` for [benchmark numbers](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/edit?usp=sharing), where the db was on the same server as the app, so the local core count was relevant.
+* **multiple cores** - if your db is operating with only one core, you won't benefit meaningfully from running queries in parallel with a connection pool.  2+ cores and you will.  It'd also be appropriate to only have as many connections as cores.  See the `benchmark.js` for [benchmark numbers](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/edit?usp=sharing), where the db was on the same server as the app, so the local core count was relevant.
 * **but isn't node single-threaded?** Yes! But db requests go out to a separate system, node makes the request and receives the data.  And mysql / mariadb can handle multiple queries at once, so why not supply them when you can?
