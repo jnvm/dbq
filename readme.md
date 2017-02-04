@@ -11,8 +11,7 @@
 	<img src="https://cldup.com/kKMuXfEQzP.svg" alt="dbq logo" style="max-width:700px;width:100%">
 </div>
 
-`dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + (callbacks || [`promises`](https://github.com/petkaantonov/bluebird) for batch execution flow control)) / (brevity &times; medium naiveté)[+ CRUD].
-
+`dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + (callbacks || [`promises`](https://github.com/petkaantonov/bluebird))) / (brevity &times; medium naiveté)[+ CRUD].
 ```
 npm i dbq
 ```
