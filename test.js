@@ -383,7 +383,7 @@ describe("dbq",function(){
 					.then(themUpdated=>{
 						var thatOne=x=>x.blah_id==190
 						expect(themUpdated.map(x=>x.thing)).to.deep.equal(them.map(x=>x.thing))
-						expect(themUpdated.filter(thatOne)[0].created - them.filter(thatOne)[0].created).to.be.below(1)
+						expect(themUpdated.filter(thatOne)[0].created - them.filter(thatOne)[0].created).to.be.below(2000)
 					})
 			})
 			it("should delete 1 by delete(#)",()=>{
