@@ -57,7 +57,7 @@ module.exports=function init(MYSQLPool,opts){
 					else then(aCxn)
 				}
 				,queryLine=isVerbose ?
-					(new Error("!").stack).split('\n').filter((line,i)=>i && !line.match(/node_modules\/dbq\/dbq/))[0].split(":")[1]
+					(new Error("!").stack).split('\n').filter((line,i)=>i && !line.match(/node_modules\/dbq\/dbq/))[0]
 					: false
 
 			//group into {sql:"",sub:[]} sets to call in desired flow
