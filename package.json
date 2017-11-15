@@ -1,6 +1,6 @@
 {
   "name": "dbq",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "terse node-mysql query wrapper to ease parallel & series execution, + simple CRUD ops",
   "main": "dbq.js",
   "repository": {
@@ -36,7 +36,6 @@
     "anti-orm"
   ],
   "dependencies": {
-    "bluebird": "^3.3.5",
     "lodash": "^4.11.1"
   },
   "devDependencies": {

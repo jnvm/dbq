@@ -1,10 +1,11 @@
 module.exports=function init(MYSQLPool,opts){
-	var Promise = require("bluebird")
-		,inFlow={
+	var inFlow={
 			series:function(calls,done=x=>x){
-				//console.log("given",calls)
-				return Promise.mapSeries(calls,x=>x())
-					.then(done)
+				return calls.reduce((p, currentTask) =>
+					p.then(resultSet =>
+						currentTask().then(result => [...resultSet, result] )
+					)
+				,Promise.resolve([])).then(done)
 			}
 			,parallel:function(calls,done=x=>x){
 				return Promise.all(calls.map(x=>x()))
