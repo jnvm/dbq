@@ -11,7 +11,7 @@
 	<img src="https://cldup.com/kKMuXfEQzP.svg" alt="dbq logo" style="max-width:700px;width:100%">
 </div>
 
-`dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + (callbacks || [`promises`](https://github.com/petkaantonov/bluebird))) / (brevity &times; medium naiveté)[+ CRUD].
+`dbq` = ([`mysql`](https://github.com/felixge/node-mysql) + (callbacks || promises)) / (brevity &times; medium naiveté)[+ CRUD].
 ```
 npm i dbq
 ```
@@ -22,6 +22,7 @@ npm i dbq
 * [Return Shortcuts](#return-shortcuts)
 * [Schemize](#schemize)
 * [Setup & Options](#setup--options)
+	* [Automatic integration with `manowar`](#automatic-integration-with-manowar)
 * [Common Methods / CRUD](#common-methods--crud)
 * [Caveats](#caveats)
 
@@ -57,7 +58,7 @@ db("select * from user where name=?",['morty'] //morty query (1)
 ,(morty,dim)=>{/*fiddle*/})
 ```
 
-If the last input isn't a function, a [bluebird promise](https://github.com/petkaantonov/bluebird#introduction) is returned, so is `then`able:
+If the last input isn't a function, a promise is returned, so is `then`able (and thus `await`able):
 ```javascript
 db("select * from jerrys where dim=?",["c-137"]
 ,"select * from ricks where dim=?",["J19ζ7"]
@@ -115,6 +116,8 @@ var mysql=require("mysql").createPool({
 		,log:(query,rows,queryLine,took,db)=>{//maybe you want to customize how queries are logged
 			console.log(`query in ${took}s:`,query.sql)
 		}
+		//if you want to retain cls-hooked namespaces, supply a binder here
+		,callbackNamespaceBinder:(cb)=>c//default is nothing meaningful
 	})
 ```
 
@@ -128,6 +131,14 @@ db.setOnce({verbose:true})("select * from meeseeks").then(lookitMee=>{/* etc */}
 db("select * from friends where name=?",['Bird Person']).then(birdPerson=>/**/)
 ```
 
+#### Automatic integration with [`manowar`](https://www.npmjs.org/manowar)
+If you are using [`manowar`](https://www.npmjs.org/manowar), and `global.cc` exists before `dbq` is set up, `dbq` can detect and preserve logging contexts for you.
+
+If you are managing [`cls-hooked`](https://www.npmjs.com/cls-hooked) namespaces on your own, you can supply your own `callbackNamespaceBinder` setup option, which is a function that accepts a callback function, binds it, then returns it.
+
+If you do not want to use either of those, or if the above made no sense, you can safely ignore it.
+
+
 ### Common Methods / CRUD
 (**C**reate, **R**ead, **U**pdate, **D**elete)
 
@@ -136,7 +147,7 @@ If you want, you can pass an object and its single-column primary keyed table na
 insert(rows[,done])//rows=[{},{},...] / {col1name:val,col2name...}
 update(rows[,done])//find by primary key in rows, update all other cols supplied
 delete(rows[,done])//find by primary key in rows, delete
-get(key[,done]) /*
+select(key[,done]) /*
 	key: If not an {}, the 1-col primary key: user.get(1); user.get('schwify')
 	Else, key creates the WHERE clause: {
 			col1:val
@@ -144,6 +155,7 @@ get(key[,done]) /*
 			[,limit:# if supplied] so...don't be weird & name your column a MySQL keyword
 		}
 */
+get(key[,done])//alias for select
 getBy${FieldName}(key[,done])// per column in the table, assuming schemize() has run to know this.
 ```
 All of which support:
@@ -160,7 +172,7 @@ Anything more complex, [consider just writing clear SQL](https://www.youtube.com
 ### Caveats
 
 * **variables and temp tables in parallel** - since parallel execution requires a connection pool, this means parallel queries will occur across different connections,
-_which_ means locally defined variables, transactions, and temporary tables have no guarantee of existing between queries, since they're connection-local.
+_which_ means in-sql defined variables, transactions, and temporary tables have no guarantee of existing between queries, since they're connection-local.
 So...define your variables in code, not queries, and consider refactoring or phrasing in series before reaching for connection-dependent features. *Or* just query them in `db.series`!
-* **multiple cores** - if your db is operating with only one core, you won't benefit meaningfully from running queries in parallel with a connection pool.  2+ cores and you will.  It'd also be appropriate to only have as many connections as cores.  See the `benchmark.js` for [benchmark numbers](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/edit?usp=sharing), where the db was on the same server as the app, so the local core count was relevant.
+* **multiple cores** - if your db is operating with only one core, you won't benefit meaningfully from running queries in parallel with a connection pool.  2+ cores and you will.  See the `benchmark.js` for [benchmark numbers](https://docs.google.com/spreadsheets/d/1KRH39wRZxmX51e_avDwTQLFPGownPB0l7PojV8q_HfA/edit?usp=sharing), where the db was on the same server as the app, so the local core count was relevant.
 * **but isn't node single-threaded?** Yes! But db requests go out to a separate system, node makes the request and receives the data.  And mysql / mariadb can handle multiple queries at once, so why not supply them when you can?

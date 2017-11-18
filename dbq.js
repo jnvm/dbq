@@ -1,4 +1,5 @@
-module.exports=function init(MYSQLPool,opts){
+module.exports=function init(MYSQLPool,opts={}){
+	
 	var inFlow={
 			series:function(calls,done=x=>x){
 				return calls.reduce((p, currentTask) =>
@@ -8,12 +9,12 @@ module.exports=function init(MYSQLPool,opts){
 				,Promise.resolve([])).then(done)
 			}
 			,parallel:function(calls,done=x=>x){
-				return Promise.all(calls.map(x=>x()))
-					.then(done)
+				return Promise.all(calls.map(x=>x())).then(done)
 			}
 		}
 		,_=require("lodash")
 		,db
+	_.defaults(opts,{callbackNamespaceBinder:global.cc && global.cc.info ? (cb)=>global.cc.namespace.active && global.cc.namespace.bind(cb) || cb : x=>x})
 	db={
 		 verbose:1
 		,setOnce:(o)=>{
@@ -46,13 +47,13 @@ module.exports=function init(MYSQLPool,opts){
 				,aCxn
 				,connectionGetter= then=>{
 					if(isParallel || !aCxn){
-						MYSQLPool.getConnection((err,dbi)=>{
+						MYSQLPool.getConnection(opts.callbackNamespaceBinder((err,dbi)=>{
 							if(err) throw Error(err)
 							else{
 								aCxn=dbi
 								then(aCxn)
 							}
-						})
+						}))
 					}
 					else then(aCxn)
 				}
@@ -85,7 +86,7 @@ module.exports=function init(MYSQLPool,opts){
 				return ()=>new Promise((good,bad)=>{
 					var t1=Date.now()
 					connectionGetter(dbi=>{
-						var query=dbi.query(qset.sql,qset.substitute,(err,rows)=>{
+						var query=dbi.query(qset.sql,qset.substitute,opts.callbackNamespaceBinder((err,rows)=>{
 							//console.log(rows)
 							if(isParallel || i==lastSet || err) dbi.release()//done querying
 							var t2=Date.now()
@@ -107,7 +108,7 @@ module.exports=function init(MYSQLPool,opts){
 							}
 							if(err) bad(err)
 							else good(results)
-						})
+						}))
 					})
 				})
 			})
@@ -155,9 +156,9 @@ module.exports=function init(MYSQLPool,opts){
 			if(!_.keys(db.table).length) throw new Error("need information_schema from schemize() first!")
 			else if(!db.table[name]) throw new Error(`cannot reference table ${name} in db!`)
 			var priKey=_.filter(db.table[name],x=>x.column_key.match(/PRI/)).map(x=>x.column_name)
+				,normalize=(rows)=> _.castArray(rows).map(row=>_.pick(row,fields))//take only tbl.cols
 				,fields=_.keys(db.table[name])
 				,nonPriFields=_.without(fields,...priKey)
-				,fieldCount=fields.length
 				,where=(row,o={in:false})=>{
 					var whereSubs=[]
 						,whereClause=_.map(_.pick(row,fields) ,(v,k)=>{
@@ -166,85 +167,84 @@ module.exports=function init(MYSQLPool,opts){
 						}).join(" and ")
 					return [whereClause,whereSubs]
 				}
-				,toMethodName=function(str){
-					return str
-						.replace(/([a-z])([A-Z])/g,'$1 $2')
-						.replace(/([^_])_([^_])/g,'$1 $2')
-						.replace(/\w\S*/g, function toProperCase(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()})
-						.split(" ").join("").split("")
-						.reduce(function decapitalize(name,ltr,i){return name+(i==0? ltr.toLowerCase() : ltr)},"")
-				}
 				,num2pk=function(key){
 					if(!_.isPlainObject(key)) key={[priKey[0]]:key,limit:1}
 					return key
 				}
-			_.defaults(model,{
-				 insert(rows,done){
-					rows=_.castArray(rows)
-					//this way preserves col order
-					var  insertCols=fields.reduce((set,part)=>set.concat( rows[0][part] ? part : []),[])
-						,colL=insertCols.length
-					//the rows could be run through to assure they're all in the same key order...but hopefully they are from parent context
-					return db(`insert into ?? (${insertCols.map(x=>`\`${x}\``)})
-								values ${rows.map(r=>"("+"?".repeat(colL).split("").join(",")+")"  ).join(",")}`
-							,[name].concat(_.flatten(rows.map(r => _.values(_.pick(r, insertCols)))))
-							,done)
-				}
-				,update(rows,done){
-					rows=_.castArray(rows)
-					//traverse set once to see which columns are updated by which keys
-					var sets={/*col:{priKeyVal:val,priKeyVal:val,...},...*/}
-					rows.forEach(row=>{
-						var changes=_.pick(row,nonPriFields)
-							,priKeyVal=_.get(row,priKey)
-						_.each(changes,(v,col)=>{
-							if(!sets[col]) sets[col]={}
-							sets[col][priKeyVal]=v
-						})
-					})
-					//could traverse a second time and aggregate keys by same val per col
-					var subs=[name]
-						,sql=`update ?? set ${_.map(sets,(valo,col)=>{
-							var q=`?? = case `
-							subs.push(col)
-							_.each(valo,(nuVal,whenPriKeyVal)=>{
-								q+=`when ?? = ? then ? `
-								subs.push(priKey[0],whenPriKeyVal,nuVal)
+				,crud=_.assign({
+						 insert(rows,done){
+							rows=normalize(rows)
+							//this way preserves col order
+							var  insertCols=fields.reduce((set,part)=>set.concat( rows[0][part]!==undefined ? part : []),[])
+								,subSpot="("+("?".repeat(insertCols.length).split("").join(","))+")"
+							//assuming rows in uniform col order
+							return db(`insert into ?? (${insertCols.map(x=>`\`${x}\``)})
+										values ${rows.map(r=>subSpot).join(",")}`
+									,[name].concat(_.flatten(rows.map(r => _.at(r,insertCols))))
+								,done)
+						}
+						,upsert(rows,done){
+							rows=normalize(rows)
+							var rowVals=rows.map(_.values)
+								,rowSubs=`(${"?".repeat(rowVals[0].length).join(",")})`.repeat(rows.length)
+							return db(`insert into ?? (${_.keys(rows[0]).map(f=>`\`${f}\``)})
+										values ${rowSubs} on duplicate key update ?`
+									,[name,..._.flatten(rowVals),rows.map(r=>_.pick(r,nonPriFields))]
+								,done)
+						}
+						,update(rows,done){
+							rows=normalize(rows)
+							//traverse set once to see which columns are updated by which keys
+							var sets={/*col:{priKeyVal:val,priKeyVal:val,...},...*/}
+							rows.forEach(row=>{
+								var changes=_.pick(row,nonPriFields)
+									,priKeyVal=_.get(row,priKey)
+								_.each(changes,(v,col)=>{
+									if(!sets[col]) sets[col]={}
+									sets[col][priKeyVal]=v
+								})
 							})
-							q+=" end "
-							return q
-						})} where ?? in (?) limit ${rows.length}`
-					subs.push(priKey[0],rows.map(row=>row[priKey[0]]))
-					return db(sql,subs,done)
-				}
-				,delete(keys,done){
-					keys=_.castArray(keys).reduce((set,key)=>{
-						if(_.isPlainObject(key)) key=key[priKey[0]]
-						return set.concat(key)
-					},[])
-					return db(`delete from ?? where ?? in (?) limit ${keys.length}`,[name,...priKey,keys])
-				}
-				,get(key,done){
-					key=num2pk(key)
-					var [wheres,subs]=where(key)
-					return db(`select * from ?? where ${wheres} ${key.limit && _.isInteger(key.limit) && key.limit>0 ?`limit ${key.limit}`:''}`,[name,...subs],done)
-				}
-			},  //where clause by field
-				fields.reduce((set, field) => {
-					set[toMethodName("get by " + field)] = (val, done) => {
-						return model.get({
-							[field]: val
-						}, done)
+							//could traverse a second time and aggregate keys by same val per col
+							var subs=[name]
+								,sql=`update ?? set ${_.map(sets,(valo,col)=>{
+									var q=`?? = case `
+									subs.push(col)
+									_.each(valo,(nuVal,whenPriKeyVal)=>{
+										q+=`when ?? = ? then ? `
+										subs.push(priKey[0],whenPriKeyVal,nuVal)
+									})
+									q+=" end "
+									return q
+								})} where ?? in (?) limit ${rows.length}`
+							subs.push(priKey[0],rows.map(row=>row[priKey[0]]))
+							return db(sql,subs,done)
+						}
+						,delete(keys,done){
+							keys=_.castArray(keys).reduce((set,key)=>{
+								if(_.isPlainObject(key)) key=key[priKey[0]]
+								return set.concat(key)
+							},[])
+							return db(`delete from ?? where ?? in (?) limit ${keys.length}`,[name,...priKey,keys])
+						}
+						,select(key,done){
+							key=num2pk(key)
+							var [wheres,subs]=where(key)
+							return db(`select * from ?? where ${wheres} ${key.limit && _.isInteger(key.limit) && key.limit>0 ?`limit ${key.limit}`:''}`,[name,...subs],done)
+						}
 					}
-					return set
-				}, {})
-			)
-			return model
+					,fields.reduce(function whereClauseByField(set, field){
+							return _.assign(set,{[_.camelCase("get by " + field)]:(val, done) =>
+								model.select({[field]: val}, done)
+							})
+						}, {})
+				)
+			crud.get=crud.select//legacy
+			return _.defaults(model,crud)
 		}
 	}
+	
 	Object.assign(db,opts)
-	//allow db("select ...") in addition to db.q("select ...")
-	Object.assign(db.q,db)
+	Object.assign(db.q,db)//allow db("select ...") in addition to db.q("select ...")
 	db=db.q
 	return db
 }
