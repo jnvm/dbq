@@ -145,6 +145,7 @@ If you do not want to use either of those, or if the above made no sense, you ca
 If you want, you can pass an object and its single-column primary keyed table name into ```db.attachCommonMethods(model,name,done)``` to attach an opinionated:
 ```javascript
 insert(rows[,done])//rows=[{},{},...] / {col1name:val,col2name...}
+upsert(rows[,done])//attempt insert, on conflict update non-primary key cols
 update(rows[,done])//find by primary key in rows, update all other cols supplied
 delete(rows[,done])//find by primary key in rows, delete
 select(key[,done]) /*
