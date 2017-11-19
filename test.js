@@ -1,5 +1,6 @@
 var mocha=require("mocha")
-	,expect=require("chai").expect
+	,chai=require("chai")
+	,expect=chai.expect
 	,mysql=require("mysql")
 	,db=false
 	,goodCreds={
@@ -10,6 +11,7 @@ var mocha=require("mocha")
 		,connectionLimit: 16
 		,connectTimeout: 15 * 60 * 1000
 	}
+chai.use(require('chai-properties'))
 
 describe("dbq",function(){
 	
@@ -304,14 +306,14 @@ describe("dbq",function(){
 				var n=1
 				return insert(n).then(res=>{
 					expect(res).to.be.an('object')
-						.to.contain.keys({insertId:5001,affectedRows:n})
+						.to.contain.properties({insertId:5001,affectedRows:n})
 				})
 			})
 			it("should insert 10",()=>{
 				var n=10
 				return insert(n).then(res=>{
 					expect(res).to.be.an('object')
-						.to.contain.keys({affectedRows:n})
+						.to.contain.properties({affectedRows:n})
 				})
 			})
 			it("should get 1 by get(#)",()=>{
@@ -328,7 +330,7 @@ describe("dbq",function(){
 					.then(res=>{
 						expect(res).to.be.an('array')
 							.of.length(n)
-						expect(res[0]).to.contain.keys({thing:'something'})
+						expect(res[0]).to.contain.properties({thing:'something'})
 					})
 			})
 			it("should get 3 using {col:[v1,v2,v3]}",()=>{
@@ -351,13 +353,13 @@ describe("dbq",function(){
 				return blah.getByThing('something').then(res=>{
 						expect(res).to.be.an('array')
 							.to.have.length.of.at.least(1)
-						expect(res[0]).to.contain.keys({thing:'something'})
+						expect(res[0]).to.contain.properties({thing:'something'})
 					})
 			})
 			it("should update 1 column in 1 row",()=>{
 				var it={thing:'fudge',blah_id:1234}
 				return blah.update(it).then(res=>{
-					expect(res).to.contain.keys({affectedRows:1})
+					expect(res).to.contain.properties({affectedRows:1})
 					return blah.get(it.blah_id)
 				})
 				.then(res=>{
@@ -386,10 +388,42 @@ describe("dbq",function(){
 						expect(themUpdated.filter(thatOne)[0].created - them.filter(thatOne)[0].created).to.be.below(2000)
 					})
 			})
+			it("should upsert 1 new row as insert",()=>{
+				var row={blah_id:5005,thing:'choco'}
+				return blah.upsert(row).then(res=>{
+					expect(res).to.have.properties({insertId:row.blah_id})
+				})
+			})
+			it("should upsert 1 row as update",()=>{
+				db.verbose=true
+				row.blah_id=1
+				row.thing='zork'
+				return blah.upsert(row).then(res=>{
+					expect(res).to.have.properties({affectedRows:2})//2 = dupe hit & update //https://dev.mysql.com/doc/refman/5.7/en/insert-on-duplicate.html
+					return blah.get(row.blah_id)
+				})
+				.then(row=>{
+					expect(row).to.have.properties(row)
+				})
+			})
+			it("should upsert 2 rows: 1 row as insert and 1 row as update",()=>{
+				var rows=[{thing:'choco',blah_id:1},{thing:'zzz',blah_id:null}]
+				return blah.upsert(rows).then(res=>{
+					expect(res).to.contain.properties({affectedRows:2+1,insertId:5001})
+					return blah.get(rows[0].blah_id)
+				})
+				.then(row=>{
+					expect(row.thing).to.eq(rows[0].thing)
+					return blah.get(5001)
+				})
+				.then(row=>{
+					expect(row.thing).to.eq(rows[1].thing)
+				})
+			})
 			it("should delete 1 by delete(#)",()=>{
 				var blah_id=1234
 				return blah.delete(blah_id).then((x)=>{
-					expect(x).to.contain.keys({affectedRows:1})
+					expect(x).to.contain.properties({affectedRows:1})
 					return blah.get(blah_id)
 				})
 				.then(x=>expect(x).to.be.undefined)
@@ -397,21 +431,22 @@ describe("dbq",function(){
 			it("should delete 1 by delete({col:#})",()=>{
 				var blah_id=1234
 				return blah.delete({blah_id}).then((x)=>{
-					expect(x).to.contain.keys({affectedRows:1})
+					expect(x).to.contain.properties({affectedRows:1})
 					return blah.get(blah_id)
 				})
 				.then(x=>expect(x).to.be.undefined)
-			})			
+			})
 			it("should delete 10 by delete({col:[#,#,#...]})",()=>{
 				var them=[123,456,789,987,654,321,147,258,369,951]
 				return blah.delete({blah_id:them}).then(x=>{
-					expect(x).to.contain.keys({affectedRows:1})
+					expect(x).to.contain.properties({affectedRows:10})
 					return blah.get({blah_id:them})
 				})
 				.then(x=>{
 					expect(x).to.have.length(0)
 				})
 			})
+			
 		})
 	})
 })

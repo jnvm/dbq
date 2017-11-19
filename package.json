@@ -1,6 +1,6 @@
 {
   "name": "dbq",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "terse node-mysql query wrapper to ease parallel & series execution, + simple CRUD ops",
   "main": "dbq.js",
   "repository": {
@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "chai-properties": "^1.2.1",
     "coveralls": "^2.11.15",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",

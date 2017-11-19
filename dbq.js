@@ -14,7 +14,7 @@ module.exports=function init(MYSQLPool,opts={}){
 		}
 		,_=require("lodash")
 		,db
-	_.defaults(opts,{callbackNamespaceBinder:global.cc && global.cc.info ? (cb)=>global.cc.namespace.active && global.cc.namespace.bind(cb) || cb : x=>x})
+	/* istanbul ignore next */ _.defaults(opts,{callbackNamespaceBinder:global.cc && global.cc.info ? (cb)=>global.cc.namespace.active && global.cc.namespace.bind(cb) || cb : x=>x})
 	db={
 		 verbose:1
 		,setOnce:(o)=>{
@@ -156,8 +156,8 @@ module.exports=function init(MYSQLPool,opts={}){
 			if(!_.keys(db.table).length) throw new Error("need information_schema from schemize() first!")
 			else if(!db.table[name]) throw new Error(`cannot reference table ${name} in db!`)
 			var priKey=_.filter(db.table[name],x=>x.column_key.match(/PRI/)).map(x=>x.column_name)
-				,normalize=(rows)=> _.castArray(rows).map(row=>_.pick(row,fields))//take only tbl.cols
 				,fields=_.keys(db.table[name])
+				,normalize=(rows)=> _.castArray(rows).map(row=>_.pick(row,fields))//take only tbl.cols
 				,nonPriFields=_.without(fields,...priKey)
 				,where=(row,o={in:false})=>{
 					var whereSubs=[]
@@ -174,23 +174,22 @@ module.exports=function init(MYSQLPool,opts={}){
 				,crud=_.assign({
 						 insert(rows,done){
 							rows=normalize(rows)
-							//this way preserves col order
-							var  insertCols=fields.reduce((set,part)=>set.concat( rows[0][part]!==undefined ? part : []),[])
+							var  insertCols=_.keys(rows[0])
 								,subSpot="("+("?".repeat(insertCols.length).split("").join(","))+")"
 							//assuming rows in uniform col order
-							return db(`insert into ?? (${insertCols.map(x=>`\`${x}\``)})
-										values ${rows.map(r=>subSpot).join(",")}`
+							return db(`insert into ?? (${insertCols.map(x=>`\`${x}\``)}) values ${rows.map(r=>subSpot).join(",")}`
 									,[name].concat(_.flatten(rows.map(r => _.at(r,insertCols))))
 								,done)
 						}
 						,upsert(rows,done){
 							rows=normalize(rows)
 							var rowVals=rows.map(_.values)
-								,rowSubs=`(${"?".repeat(rowVals[0].length).join(",")})`.repeat(rows.length)
-							return db(`insert into ?? (${_.keys(rows[0]).map(f=>`\`${f}\``)})
-										values ${rowSubs} on duplicate key update ?`
-									,[name,..._.flatten(rowVals),rows.map(r=>_.pick(r,nonPriFields))]
-								,done)
+								,rowSub=`(${"?".repeat(rowVals[0].length).split('').join(',')})`
+								,rowSubs=_.fill(Array(rows.length),rowSub).join(",")
+								,cols=_.keys(rows[0])
+							return db(`insert into ?? (${cols.map(f=>`\`${f}\``)}) values ${rowSubs} on duplicate key update ${
+									cols.map(c=>`\`${c}\`=values(\`${c}\`)`).join(",")
+								}`,[name,..._.flatten(rowVals)],done)
 						}
 						,update(rows,done){
 							rows=normalize(rows)
